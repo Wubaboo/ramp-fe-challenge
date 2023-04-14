@@ -9,8 +9,6 @@ export function useTransactionsByEmployee(): TransactionsByEmployeeResult {
 
   const fetchById = useCallback(
     async (employeeId: string) => {
-      // BUG7: Old approval values are being cached
-      // Clear the cache after the checkboxes are clicked
       const data = await fetchWithCache<Transaction[], RequestByEmployeeParams>(
         "transactionsByEmployee",
         {
