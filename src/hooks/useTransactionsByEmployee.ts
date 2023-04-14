@@ -4,14 +4,14 @@ import { TransactionsByEmployeeResult } from "./types"
 import { useCustomFetch } from "./useCustomFetch"
 
 export function useTransactionsByEmployee(): TransactionsByEmployeeResult {
-  const { fetchWithoutCache, loading } = useCustomFetch()
+  const { fetchWithCache, loading } = useCustomFetch()
   const [transactionsByEmployee, setTransactionsByEmployee] = useState<Transaction[] | null>(null)
 
   const fetchById = useCallback(
     async (employeeId: string) => {
-      // BUG7: Old approval values are being cached - use fetchWithoutCache
-      // Alternatively, to reduce unnecessary wait times, invalidate the data after the checkboxes are clicked
-      const data = await fetchWithoutCache<Transaction[], RequestByEmployeeParams>(
+      // BUG7: Old approval values are being cached
+      // Clear the cache after the checkboxes are clicked
+      const data = await fetchWithCache<Transaction[], RequestByEmployeeParams>(
         "transactionsByEmployee",
         {
           employeeId,
@@ -20,7 +20,7 @@ export function useTransactionsByEmployee(): TransactionsByEmployeeResult {
 
       setTransactionsByEmployee(data)
     },
-    [fetchWithoutCache]
+    [fetchWithCache]
   )
 
   const invalidateData = useCallback(() => {

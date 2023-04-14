@@ -4,15 +4,15 @@ import { PaginatedTransactionsResult } from "./types"
 import { useCustomFetch } from "./useCustomFetch"
 
 export function usePaginatedTransactions(): PaginatedTransactionsResult {
-  const { fetchWithoutCache, loading } = useCustomFetch()
+  const { fetchWithCache, loading } = useCustomFetch()
   const [paginatedTransactions, setPaginatedTransactions] = useState<PaginatedResponse<
     Transaction[]
   > | null>(null)
 
   const fetchAll = useCallback(async () => {
-    // BUG7: Old approval values are being cached, use fetchWithoutCache
-    // Alternatively, to reduce unnecessary wait times, invalidate the data after the checkboxes are clicked
-    const response = await fetchWithoutCache<PaginatedResponse<Transaction[]>, PaginatedRequestParams>(
+    // BUG7: Old approval values are being cached
+    // Clear the cache after checkboxes are clicked
+    const response = await fetchWithCache<PaginatedResponse<Transaction[]>, PaginatedRequestParams>(
       "paginatedTransactions",
       {
         page: paginatedTransactions === null ? 0 : paginatedTransactions.nextPage,
@@ -30,7 +30,7 @@ export function usePaginatedTransactions(): PaginatedTransactionsResult {
 
       return { data: previousResponse.data, nextPage: response.nextPage }
     })
-  }, [fetchWithoutCache, paginatedTransactions])
+  }, [fetchWithCache, paginatedTransactions])
 
   const invalidateData = useCallback(() => {
     setPaginatedTransactions(null)
